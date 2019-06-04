@@ -1,0 +1,128 @@
+---
+title: "Stat 418 - Final project"
+author: "Yichen Zhou"
+date: "2019Äê5ÔÂ31ÈÕ"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Libraray Packages
+```{r}
+library(ggplot2)
+library(Hmisc)
+library(car)
+library(xgboost)
+```
+
+
+# Read data
+```{r}
+data <- read.csv("films.csv",na.strings = "null")
+data <- data[,c(4:7,9,10)]
+
+```
+
+
+# Genre - select the first one as the genre
+```{r}
+for (i in 1:length(data[,'Genre'])) {
+  a <- as.vector.factor(data[i,'Genre'])
+  b <- unlist(strsplit(a,split=","))
+  data[i,'Genre'] <- b[1]
+}
+data$Genre[data$Genre=='Thriller'] = "Horror"
+data$Genre[data$Genre=='Sport'|data$Genre=='Crime'|data$Genre=='Western'] = "Action"
+data$Genre[data$Genre=="Family"|data$Genre=="Musical"|data$Genre=='Music'|data$Genre=='History'] = "Drama"
+data$Genre[data$Genre=='Sci-Fi'|data$Genre=='Fantasy'|data$Genre=='War'|data$Genre=='Mystery'] = "Adventure"
+data$Genre <- factor(data$Genre, levels = c("Action","Adventure","Animation","Biography","Comedy","Drama","Horror","Romance"))
+```
+
+
+# Run_time 
+```{r}
+Run_time <- data$Run_time
+data$Run_time <- as.numeric(data$Run_time)
+for (i in 1:length(data[,'Run_time'])) {
+  a <- as.vector(Run_time[i])
+  b <- unlist(strsplit(a,split=" "))
+  data[i,'Run_time'] <- as.numeric(b[1])
+}
+
+
+```
+
+# Plot
+```{r}
+ggplot(data,aes(Metascore,IMDbscore))+geom_point()+labs(title="Scatterplot of IMDbscore vs. Metascore")+ theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+# Fill in Missing value
+```{r}
+
+data$IMDbscore <- impute(data$IMDbscore,median)
+data$Metascore <- impute(data$Metascore,median)
+data$Votes <- impute(data$Votes,median)
+data$Run_time <- impute(data$Run_time,median)
+data$Genre <- impute(data$Genre, 'Drama')
+
+data$Popularity_rank<-as.numeric(data$Popularity_rank)
+data$IMDbscore<-as.numeric(data$IMDbscore)
+data$Metascore<-as.numeric(data$Metascore)
+data$Votes<-as.numeric(data$Votes)
+data$Run_time<-as.numeric(data$Run_time)
+data$Genre<- as.factor(data$Genre)
+
+```
+
+
+
+# Transformation for Vote
+```{r}
+ggplot(data,aes(Votes))+geom_histogram()+ labs(title="Histogram of Votes")+ theme(plot.title = element_text(hjust = 0.5))
+```
+```{r}
+d <- data
+d$Votes = log(d$Votes+1)
+ggplot(d,aes(Votes))+geom_histogram() + labs(title="Histogram of Votes after log transformation")+ theme(plot.title = element_text(hjust = 0.5))
+```
+
+# Split data
+```{r}
+#set.seed(2019)
+#index <- sample(1:5000,3500,replace = FALSE)
+#data <- data[index,]
+#test_data<- data[-index,]
+```
+
+
+# Model - Linear Regression
+```{r}
+reg <- lm(IMDbscore ~ Popularity_rank + Metascore + log(Votes) + Run_time + Genre, data = data)
+summary(reg)
+
+
+sprintf("The RMSE of the model is %f",sqrt(sum(residuals(reg)^2)/reg$df.residual))
+```
+
+# Model - Xgboost
+```{r}
+data1<-data
+data1$Run_time<- as.numeric(data1$Run_time)
+data1$Genre <- as.numeric(data1$Genre)
+x<-as.matrix(data1[,c(1,3:6)])
+y<-as.matrix(data1$IMDbscore)
+xgb<-xgboost(data = x, label = y, max.depth = 6,eta = 0.3, nthread = 2, verbose=2, nround = 10)
+
+summary(xgb)
+
+```
+
+
+
+
+
+
