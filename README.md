@@ -30,11 +30,11 @@ There are two ways to access this app.
 
 <br>
 
-After opening this app, I give two ways to input the data. You can choose one of them. In the first way, you can adjust the sliders and radio buttons to input desired values for Popularity_rank, Metascore, Votes, Run_time, Genre to get a prediction of the IMDbscore as well as selecting the Linear Regression model or the XGBoost model. In the second way, you need to input a .csv file, this .csv file must have and only have these five variables including  Popularity_rank, Metascore, Votes, Run_time, Genre with the correct classes.
+After opening this app, I give two ways to input the data. You can choose one of them. In the first way, you can adjust the sliders and radio buttons to input desired values for Popularity_rank, Metascore, Votes, Run_time, Genre to get a prediction of the IMDbscore as well as selecting the Linear Regression model or the XGBoost model. In the second way, you need to input a .csv file, this .csv file must have and only have these five variables including Popularity_rank, Metascore, Votes, Run_time, Genre with the correct classes.
 
 ## Data Cleaning and Exploratory Data Analysis
-Firstly, let¡¯s look at the scatter plot of the outcome variable as follows:  <br>
-![](./images/Scatterplot of IMDbscore.png)
+Firstly, let’s look at the scatter plot of the outcome variable as follows:  <br>
+![](./images/Scatterplot1.png)
 
 We can see this plot looks very nice. Because there are not any larger outliers. And there many points in the middle part of this plot and just a few points in the two sides, which may tells us the distribution of the IMDb score is normal.
 
@@ -42,35 +42,35 @@ Then, I will show the heatmap of my dataset. The heatmap can show the correlatio
 ![](./images/Heatmap.png)
 
 From the heatmap, we can find the correlation between the IMDbscore and the Meta score is around 0.6, which is very high, so I want to find out the relationship between them by plotting the scatter plot of them. <br>
-![](./images/Scatterplot of IMDbscore vs. Metascore.png)
+![](./images/Scatterplot2.png)
 
 From this scatter plot, we can judge that there is a positive relationship between the IMDbscore and the Meta score. With one of these two variables increasing, the other variable will increase, too.
 
-What¡¯s more  since the original data set contains some missing values in these varibales: IMDbscore, Metascore, Votes, Run_time and Genre, so I need to deal with this missing values. As for the first four variables, I want fill the missing values by the median values of them because they are numeric variables. As for the Genre variable, I want to fill the missing value by the median value because it is a character variable.
+What’s more  since the original data set contains some missing values in these variables: IMDbscore, Metascore, Votes, Run_time and Genre, so I need to deal with this missing values. As for the first four variables, I want fill the missing values by the median values of them because they are numeric variables. As for the Genre variable, I want to fill the missing value by the median value because it is a character variable.
 
 ## Feature Engineering
 When I plan to deal with the Genre variables, I find there are some problems. Because there are more than one values in this variable as follows: <br>
-![](./images/Original Genre Variable.png)
+![](./images/Genre1.png)
 
 Actually, I need to deal with it. Otherwise, it will be difficult for me to do analysis and model fitting. I choose to save the first value of the Genre variable and delete the other values. And then the Genre variable becomes like this as follows: <br>
-![](./images/Genre variable after processing.png)
+![](./images/Genre2.png)
 
 In addition, I want to see the distribution of some variables to find out whether I need to take transformation to some variables. <br>
-![](./images/Histogram of votes.png)
+![](./images/Votes.png)
 
-From the histogram of the votes, I find the distribution of the votes variable isn¡¯t normal because it has a long tail in the right side. In order to deal with this situation, I decide to take log transformation to this Votes variable. <br>
-![](./images/Histogram of log votes.png)
+From the histogram of the votes, I find the distribution of the votes variable isn’t normal because it has a long tail in the right side. In order to deal with this situation, I decide to take log transformation to this Votes variable. <br>
+![](./images/Logvotes.png)
 
 After I take log transformation to it, the vote variable become more normal.
 
 ## Modeling
-Now I want tot try two models: the multiple linear regression and the XGBoost model.(What¡¯s more, the clients can select one of the two models to predict the value as they want in the shinyapp.) . I compute the rmse of the linear model is 1.303. And the summary of the linear model is as follows: <br>
-![](./images/Linear Regression.png)
+Now I want to try two models: the multiple linear regression and the XGBoost model. (What’s more, the clients can select one of the two models to predict the value as they want in the shinyapp.) . I compute the rmse of the linear model is 1.303. And the summary of the linear model is as follows: <br>
+![](./images/LM.png)
 
 From the summary of the linear model, we can see the p-value is less than 0.01, which shows the model truly has statistical meaning. However, the R-squared is only 0.12 which is not very satisfying. So maybe we can find a better model.
 
-Let¡¯s see the XGBoost model, I select the nround equals to 10. And this shows the rmse for each round. <br>
-![](./images/Rmse - XGB.png)
+Let’s see the XGBoost model, I select the nround equals to 10. And this shows the rmse for each round. <br>
+![](./images/Rmse.png)
 
 In the last round, we can see the rmse of XGBoost model is 1.13 which is less than the rmse of the multiple linear regression. Therefore, the XGBoost should be better than the linear regression model.
  
