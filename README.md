@@ -18,9 +18,9 @@ There are two ways to access this app.
 
 `$ git clone https://github.com/BadBoyfearness/Stat-418-Project-Yichen_Zhou.git`
 
-**or download zip file to the same directory. Then change your working directory to `docker` and run:**
+**or download zip file to the same directory. Then change your working directory to `docker/app` and run:**
 
-`R -e "shiny::runApp('app/')"`
+`R -e "shiny::runApp()"`
 
 **Copy the outputting link to any browser to run this app.** 
 
